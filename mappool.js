@@ -112,7 +112,7 @@ function resolveNextMap() {
 function next() {
     resolveNextMap();
     (async () => {
-        let data = await getMapData(name);
+        let data = await getMapData(currentMapName);
         console.log(typeof data);
 	    loadMap(name, data);
     })();
