@@ -160,9 +160,9 @@ COMMAND_REGISTRY.add("map", ["!map #mapname#: load map from gitlab webliero.gitl
     return false;
 }, true);
 
-COMMAND_REGISTRY.add("mapi", ["!map #mapname#: load map by pool index, without any effect"], (player, idx) => {
+COMMAND_REGISTRY.add("mapi", ["!mapi #index#: load map by pool index, without any effect"], (player, idx) => {
     if (typeof idx=="undefined" || idx=="" || isNaN(idx) || idx>=mypool.length) {
-        announce("wrong index, choose any index from 0 to "+mypool.length-1,player, 0xFFF0000);
+        announce("wrong index, choose any index from 0 to "+(mypool.length-1),player, 0xFFF0000);
         return false;
     }
     currentMapName = mypool[idx];
