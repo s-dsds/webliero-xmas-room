@@ -19,7 +19,7 @@ async function getMapData(name) {
 
     let obj = mapCache.get(name)
     if (obj) {
-   //   return obj;
+      return obj;
     }
     if (name.split('.').pop()=="png") {    
        obj = await getPngMapData(name);
