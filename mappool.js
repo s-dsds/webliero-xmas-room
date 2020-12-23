@@ -111,10 +111,13 @@ function resolveNextMap() {
 
 function next() {
     resolveNextMap();
+    loadCurrentMap();
+}
+
+function loadCurrentMap() {
     (async () => {
         let data = await getMapData(currentMapName);
-        console.log(typeof data);
-	    loadMap(name, data);
+	    loadMap(currentMapName, data);
     })();
 }
 
@@ -151,9 +154,18 @@ function _base64ToArrayBuffer(base64) {
 }
 
 
-COMMAND_REGISTRY.add("map", ["!map #mapname#: load lev map from gitlab webliero.gitlab.io, applying a random effect"], (player, ...name) => {
-    let fxidx = Math.floor(Math.random() * effectList.length);
+COMMAND_REGISTRY.add("map", ["!map #mapname#: load map from gitlab webliero.gitlab.io, without any effect"], (player, ...name) => {
     currentMapName = name.join(" ");
-    loadEffect(fxidx, currentMapName);
+    loadCurrentMap();
+    return false;
+}, true);
+
+COMMAND_REGISTRY.add("mapi", ["!map #mapname#: load map by pool index, without any effect"], (player, idx) => {
+    if (typeof idx=="undefined" || idx=="" || isNaN(idx) || idx>=mypool.length) {
+        announce("wrong index, choose any index from 0 to "+mypool.length-1,player, 0xFFF0000);
+        return false;
+    }
+    currentMapName = mypool[idx];
+    loadCurrentMap();
     return false;
 }, true);
