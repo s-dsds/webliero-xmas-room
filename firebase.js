@@ -1,9 +1,7 @@
 var fdb;
 var commentsRef;
 var notifsRef;
-var modsRef;
 var loginsRef;
-var statsRef;
 
 function initFirebase() {
     async function load_scripts(script_urls) {
@@ -38,41 +36,13 @@ function initFirebase() {
 		
 		firebase.initializeApp(CONFIG.firebase);
 		fdb = firebase.database();
-		commentsRef = fdb.ref('bg/comments');
-        notifsRef = fdb.ref('bg/notifs');
-        modsRef = fdb.ref('bg/mods');
-        loginsRef = fdb.ref('bg/logins');
+		commentsRef = fdb.ref('xmas/comments');
+        notifsRef = fdb.ref('xmas/notifs');
+        loginsRef = fdb.ref('xmas/logins');
 		console.log('firebase ok');
-		//loadExistingMods();
-		listenForModsEvents();
 	})();		
 }
 
-
-function listenForModsEvents() {
-    modsRef.on('child_added', addNewMod);
-    modsRef.on('child_changed', addNewMod);
-}
-
-function addNewMod(childSnapshot) {
-	var v = childSnapshot.val();
-	var k = childSnapshot.key;
-
-  addMod(k,v);
-  if (k!="build") {
-    currMod = k;
-  }
-  
-  console.log("mod `"+k+"`: `"+v.name+"` v `"+v.version+"` has been added to memory");
-  notifyAdmins("mod `"+k+"`: `"+v.name+"` v `"+v.version+"` has been added to memory");
-}
-
-function loadExistingMods() {
-    modsRef.orderByKey().once('value', function(snapshot) {
-        snapshot.forEach(addNewMod);
-      });
-      
-}
 
 function writeLogins(p, type ="login") {
     const now = Date.now();
@@ -82,9 +52,4 @@ function writeLogins(p, type ="login") {
 function writeLog(p, msg) {
     const now = Date.now();
     commentsRef.child(now).set({name: p.name, auth:auth.get(p.id), msg:msg, formatted:(new Date(now).toLocaleString())});
-}
-
-function writeGameStats(event, stats) {
-  const now = Date.now();
-  statsRef.child(now).set({event: event, stats:stats});
 }
