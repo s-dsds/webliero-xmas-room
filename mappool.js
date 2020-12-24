@@ -6,6 +6,7 @@ var currentMap = 0;
 var currentMapName = "";
 var currentEffect = 0;
 var effectList=Object.keys(effects);
+var autoExpand = -1;
 
 function loadPool(name) {
 	(async () => {
@@ -97,9 +98,10 @@ COMMAND_REGISTRY.add("fx", [()=>"!fx "+JSON.stringify(effectList)+": adds fx to 
     return false;
 }, true);
 
-function loadMap(name, data) {
+function loadMap(name, data, expand=false) {
     console.log(data.data.length);
     console.log(data.data[2]);
+    setExpand(expand);
     let buff=new Uint8Array(data.data).buffer;
     window.WLROOM.loadRawLevel(name,buff, data.x, data.y);
 }
@@ -116,9 +118,24 @@ function next() {
 
 function loadCurrentMap() {
     (async () => {
-        let data = await getMapData(currentMapName);
-	    loadMap(currentMapName, data);
+        let data = await getMapData(currentMapName);        
+	    loadMap(currentMapName, data, shouldExpand());
     })();
+}
+
+function setExpand(expand) {
+    let sets = window.WLROOM.getSettings();
+    if (sets.expandLevel!=expand) {
+        sets.expandLevel=expand;
+        window.WLROOM.setSettings(sets);
+    }
+}
+
+function shouldExpand() {
+    if (autoExpand==-1) {
+        return false;
+    }
+    return (getActivePlayers().length>=autoExpand);
 }
 
 function loadEffects(fxs, name) {
@@ -167,5 +184,21 @@ COMMAND_REGISTRY.add("mapi", ["!mapi #index#: load map by pool index, without an
     }
     currentMapName = mypool[idx];
     loadCurrentMap();
+    return false;
+}, true);
+
+COMMAND_REGISTRY.add("clearcache", ["!clearcache: clears local map cache"], (player) => {
+    mapCache = new Map();
+    return false;
+}, true);
+
+COMMAND_REGISTRY.add("autoexp", ["!autoexp #number#: set auto expand with #number# as threshold"], (player, threshold) => {
+    if (typeof threshold=="undefined" || threshold=="" || isNaN(threshold)) {
+        autoExpand = -1;
+        notifyAdmins("cleared autoexpand threshold");
+        return false;
+    }
+    autoExpand = parseInt(threshold);
+    notifyAdmins("autoexpand threshold set to `"+threshold+"`");
     return false;
 }, true);
