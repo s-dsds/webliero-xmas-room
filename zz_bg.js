@@ -1,4 +1,7 @@
-window.WLROOM.onPlayerLeave = function(player) {  
+initFirebase();
+
+window.WLROOM.onPlayerLeave = function(player) { 
+	writeLogins(player, "logout"); 
 	auth.delete(player.id);
 }
 window.WLROOM.onGameEnd2 = function(player) {  
